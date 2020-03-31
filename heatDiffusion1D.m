@@ -1,97 +1,98 @@
-function [sampleOut,tArray,TmatDimensional] = heatDiffusion1D(sampleIn,duration,T)
-% same approach as in Mitchell and Reiners (2003), Geology, SM. 
-%	Thanks to Mark Harrison for his lecture notes, which helped in implementing this solution.
+function [sampleOut,tarray,Tmat] = heatDiffusion1D(sampleIn,duration,Trock,Theatbath)
+%   (3/27/2020)
+%   transient head conduction in 1-D sphere with internal heat gradient 
+%       (appropriate when thermally thick; biot number > 0.1)
 
 % INPUTS
-%   sampleIn -- sample structure. The first time this 'heatDiffusion1D' fxn is called, the internal temperature structure field of the sample is created.
-%               All subsequent times, the field is queried. This means that the internal temperature of the rock can be remembered, and the rock can be
-%               repeatedly passed to this function, allowing, for example, for a ramp up, a hold temperature, and a ramp down.
+%   sampleIn -- sample structure
 %   duration -- ka, the total time of simulation
-%   T -- deg.C, same format as in rest of library: if single value, constant; if 3 values, interpreted as [initial,final,k] values, where
-%               k defines whether change with time is linear (k=1), sublinear (k<1), or supralinear (k>1). In other words: T(t) = (t/tF)^k * (TF - T0) + T0
-
-%   NOTE:   If not previously defined, the internal temperature of the cobble is taken as the constant or initial temperature value. All subsequent times
-%               that the function is called, the internal temperature is read from the sampleIn data structure. This means that you must ramp up to higher temperatures (at least the first time).
-%               Long heats (i.e., duration > t_D) are remembered. So, for example, if you dose a sample for 1 Ma at 10C, that becomes the internal temperature at all depths. If 
-%               the current fxn were called, this internal temperature would be adopted (not the constant or initial temperature value from 'T'). So, it is only if you created
-%               a sample and then immediately heated the sample from 15C to 500C over 20s, that the internal temperature would be set to 15C.
+%   Trock -- deg.C, starting internal temperature of the rock; only single value is possible
+%   Theatbath -- deg.C, temperature of 'infinite heat bath', e.g., air
+%      temperature during wildfire
 %
 % OUTPUTS
 %   sampleOut -- This structure will contain the updated 'internalTarray' field
 %   tArray -- Every timestep with a T(d,t) solution, ka
-%   TmatDimensional -- T(d,t) in ka and deg C
+%   TmatDimensional -- T(d,t) in deg C
 
-%%
-sampleOut=sampleIn;
-
-        %while the cobble is normally a 'half cobble', i.e., modelled from the surface to the center,
-        %   for our heat equation solution we need fixed boundary conditions, so we deal with a 'whole cobble' in
-        %   only within this function before converting back to a half cobble
-        dArrayHalf=sampleOut.nN(:,1);
-        d_d=dArrayHalf(2)-dArrayHalf(1);
-        diam=max(dArrayHalf)*2;
-        
-        dArrayFull=0:d_d:diam;
-        
-        %first, identify dt step size that is suited for explicit finite difference solution
-        %   at this stage, I only include linearly spaced arrays. Logarhithmic spacing could improve 
-        %   speed in cases of nonlinear T(t) functions
-        
-        kappa=1*3600*24*365.25*1e3;%mm^2/ka. 1 mm^2/s is a pretty standard value for granite
-        dt=duration/1;%this never gets chosen; even if suitable, divided by 10 in first loop.
-        r=99;
-        while r >= 0.5%make sure step size is numerically stable
-            d_tPrime=kappa*dt/(diam^2);
-            d_dPrime=d_d/diam;
-            r=d_tPrime/(d_dPrime^2);
-
-            dt=dt/2;
-        end
-
+%% read in sample structure
+    sampleOut=sampleIn;
+    dArray=sampleOut.nN(:,1);%depths, mm
+    
+    %note that, by frame of reference, r=r0 is surface, r=0 is center
+    r0=dArray(end);
+    rStarArray=dArray./r0;
+    
     % time, ka
-    tArray=0:dt:duration;
-       
-    %if the internal temperature structure of the cobble is yet undefined
-    if ~isfield(sampleOut,'internalTarray')
-        %define as initial temperature
-        sampleOut.internalTarray(1:length(dArrayHalf))=val_from_t(0,duration,T);
-    end
+    numtstep=500;
+    tarray=(duration/numtstep):(duration/numtstep):duration;
     
-    Tmat=ones(length(dArrayFull),length(tArray));
-    Tmax=max(val_from_t(tArray,duration,T));
+    %% thermal properties
+    % typical values for granite
+    Km2s=1.6e-6;%thermal diffusivity, m^2/s
+    K=Km2s*1e6*(3600*24*365.25*1e3);%mm^2/ka
+    kappaWmK=2;%W/(m*K)
+    kappa=kappaWmK/1e3;%W/(mm*K)
+    % taken from Butler (2010), based on heating of sensors during wildland
+    %   fire experiment
+    hcWm2K=50;%convective heat transfer coefficient, W/(m^2*K)
+    hc=hcWm2K/1e6;%W/(mm^2*K)
+                    
+    % Fourier number
+    Fo=(K*duration)./r0^2;
+    disp('Fourier number: ')
+    disp(Fo)
     
-    %variable T boundary condition
-    Tmat(1,:)=val_from_t(tArray,duration,T);
-    Tmat(end,:)=Tmat(1,:);
-    
-    %intial condition for internal cobble temperatures, borrowed from 'sample' data structure
-    Tmat(2:end-1,1)=[sampleOut.internalTarray(2:end) fliplr(sampleOut.internalTarray(2:end-1))]';
-    
-    %dimensionless
-    tPrimeArray=(kappa*tArray)./(dArrayFull(end)^2);%dimensionless time array
-    dPrimeArray=dArrayFull./dArrayFull(end);%dimensionless depth array
-    TprimeMat=Tmat./Tmax;%dimensionless temperature array
-    
-   %% loop through matrix
-    % for every time
-    for t_i=1:length(tPrimeArray)-1
-        %for every depth except surface
-        for d_i=2:length(dPrimeArray)-1
-            d_tPrime=tPrimeArray(t_i+1)-tPrimeArray(t_i);
-            d_dPrime=dPrimeArray(d_i)-dPrimeArray(d_i-1);
-            r=d_tPrime/(d_dPrime^2);
-            TprimeMat(d_i,t_i+1)=TprimeMat(d_i,t_i) + r.*(TprimeMat(d_i-1,t_i) + TprimeMat(d_i + 1,t_i) - 2*TprimeMat(d_i,t_i));
+    %% calculate roots
+    % Biot number (dimensionless); thermally 'thin' when Bi < 0.1; 
+    %   small values indicate that heat transport is limited by convection at the surface, not conduction within the interior
+    Bi=(hc/kappa)*r0;
+    disp('Biot number: ')
+    disp(Bi)
+    %calculate roots
+    zetaMax=500;%find roots of Bi = 1 - zeta*cot(zeta) from zeta = 0 to zetaMax
+    zArray=zRoots(Bi,zetaMax);
+
+    %% calculate thetaStar
+    thetaStarMat=zeros(length(rStarArray),length(tarray));
+
+    wb=waitbar(0,'iterating through T(r,t)');
+    for k=1:length(rStarArray)
+        waitbar(k/length(rStarArray))
+        rStar_k=rStarArray(k);
+
+        for j=1:length(tarray)
+            t_j=tarray(j);
+
+            % Fourier number
+            Fo=(K*t_j)./r0^2;% Fourier number array (dimensionless); small values indicate that heat does not have sufficient time to equilibrate by diffusion for supplied time value
+            %calculate thetaStar array
+            thetaStarArray=zeros(size(zArray));
+            for i=1:length(zArray)
+                z_i=zArray(i);
+
+                numer=4*(sin(z_i)-z_i*cos(z_i));
+                denom=2*z_i-sin(2*z_i);
+                Cn_i=numer/denom;
+
+                thetaStarArray(i)=Cn_i.*exp(-z_i^2*Fo).*(1/(z_i*rStar_k)).*sin(z_i*rStar_k);
+            end
+            thetaStar=sum(thetaStarArray);
+            thetaStarMat(k,j)=thetaStar;
         end
     end
+    close(wb)
+
+    %% convert thetaStar(rStar,t) into T(rStar,t)
+    Tmat=Theatbath+(Trock-Theatbath)*thetaStarMat;
     
-    %update cobble's internal temperature structure, but first convert back into 
-    %   'half-cobble'
-    TmatDimensional=Tmax*TprimeMat(1:length(dArrayHalf),:);%in degC, the temperature at every d,t combination
-    sampleOut.internalTarray(:)=TmatDimensional(:,end);
+    %% flip T(d,t) matrix vertically to get correct frame of reference
+    Tmat(1,:)=Tmat(2,:);%lazy temporary fix
+    Tmat=flipud(Tmat);
     
     %% plot T(d,t)
     figure
-    surf(tArray*1e3*365.25*24*60,dArrayHalf/10,TprimeMat(1:length(dArrayHalf),:).*Tmax);
+    surf(tarray*1e3*365.25*24*60,dArray/10,Tmat);
     xlabel('Time (min)')
     ylabel('Cobble depth (cm)')
     zlabel('Temperature (deg.C)')
@@ -105,8 +106,12 @@ sampleOut=sampleIn;
     
     % plot T_surf (t)
     figure
-    plot(tArray*1e3*365.25*24*60,Tmat(1,:)');
+    plot(tarray*1e3*365.25*24*60,Tmat(1,:)');
+    hold on
+    plot(tarray*1e3*365.25*24*60,Tmat(end,:)');
+    hold off
     xlabel('Time (min)')
     ylabel('Temperature (deg.C)')
     
+
 end

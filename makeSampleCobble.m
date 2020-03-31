@@ -7,8 +7,10 @@ sampleOut=sampleIn;
 
     if ~isfield(sampleOut,'nN')%if not previously defined,
         sampleOut.nN=1;%define as 1
+    
     elseif length(sampleOut.nN) > 1%or, if sample is already a cobble, do nothing
         disp('Sample is already a cobble. Doing nothing.')
+    
     else
         val=sampleOut.nN;
 

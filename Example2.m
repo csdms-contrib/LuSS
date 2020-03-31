@@ -20,7 +20,7 @@ sample=struct;%a data structure
 %%  Define sample as a cobble of radius 3 cm. Monitor n/N evolution at 0.1 mm spacing. r d=0:spacing:radius
 [sample]=makeSampleCobble(sample,30,0.1);
 
-%%  Cool from 110 to 10 deg.C over 1 Ma (dT/dt = -100C/Ma)
+%%  Cool from 110 to 10 deg.C over 1 Ma (dT/dt = -1000C/Ma)
 T0=110;%deg.C, initial temperature
 TF=10;%deg.C, final temperature
 t=100;%ka
