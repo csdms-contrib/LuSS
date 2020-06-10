@@ -1,5 +1,5 @@
-# geomorph-luminescence
-A set of MATLAB functions to model how luminescence evolves in different geomorphic scenarios. Specifically, exposures to heat and sunlight can be simulated and the resulting signals shown. For a detailed description of the underlying luminescence rate equations, or to cite your use of **geomorph-luminescence**, please use [Brown, (2020)](#B2020).
+# Luminescence Sample Simulator: 
+A set of MATLAB functions to model how luminescence evolves in different geomorphic scenarios. Specifically, exposures to heat and sunlight can be simulated and the resulting signals shown. For a detailed description of the underlying luminescence rate equations, or to cite your use of **LuSS**, please use [Brown, (2020)](#B2020).
 
 # Table of Contents
 1. [Three worked examples](#three-examples)
