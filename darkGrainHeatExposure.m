@@ -1,5 +1,5 @@
-function [sampleOut,nN_t_d,tArray] = darkHeatExposure(sampleIn,exposureTime,varargin)
-% exposes sample to static or changing heat without sunlight.
+function [sampleOut,nN_t_d,tArray] = darkGrainHeatExposure(sampleIn,exposureTime,varargin)
+% exposes grain to static or changing heat without sunlight.
 %    
 %   INPUTS:
 %       sampleIn: a structure containing sample characteristics
@@ -15,7 +15,7 @@ function [sampleOut,nN_t_d,tArray] = darkHeatExposure(sampleIn,exposureTime,vara
 %
 %   OUTPUTS:
 %       sampleOut: a structure containing sample characteristics after experiencing the environmental history
-%       nN_t_d: one column per depth, one row per timestep; if a grain, only one column
+%       nN_t_d: column vector with an entry per timestep
 %       tArray: one column with each entry a timestep (ka)
 
 mu_W=0.1;%attenuation coefficient for water, mm^-1
@@ -33,6 +33,9 @@ elseif length(varargin)==3
     else
         exposureTemperature=[initialTemperature,finalTemperature,linearity];    
     end
+elseif length(sampleOut.nN) > 1%or, if sample is a cobble, do nothing
+    disp('Sample is a cobble. Doing nothing.')
+    return
 else
     disp('Length of varargin must be 1 or 3')
     return
