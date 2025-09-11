@@ -7,16 +7,16 @@ A graphical user interface (GUI) that incorporates some of the functions in [Bro
 
 # Table of Contents
 1. [MATLAB functions](#MATLAB-fxns)
-	A. [Three worked examples](#three-examples)
-	B. [Functions to manipulate a sample](#manip-fxns)
-		i. [Functions to initiate a sample](#init-fxns)
-		ii. [Functions to expose a sample to the environment](#expose-fxns)
-	C. [Functions to plot a sample's luminescence signal](#plot-fxns)
-	D. [Other functions](#other-fxns)
+	1. [Three worked examples](#three-examples)
+	2. [Functions to manipulate a sample](#manip-fxns)
+		1. [Functions to initiate a sample](#init-fxns)
+		2. [Functions to expose a sample to the environment](#expose-fxns)
+	3. [Functions to plot a sample's luminescence signal](#plot-fxns)
+	4. [Other functions](#other-fxns)
 2. [*LuSS* GUI](#LuSS-GUI)
-	A. [Installing *LuSS* GUI as MATLAB toolbox](#install-toolbox)
-	B. [Installing *LuSS* GUI as standalone application](#install-standalone)
-	C. [GUI description](#GUI-description)
+	1. [Installing *LuSS* GUI as MATLAB toolbox](#install-toolbox)
+	2. [Installing *LuSS* GUI as standalone application](#install-standalone)
+	3. [GUI description](#GUI-description)
 3. [Reference](#Reference)
 
 # MATLAB functions <a name="MATLAB-fxns"></a>
