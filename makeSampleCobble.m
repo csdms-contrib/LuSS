@@ -7,7 +7,15 @@ sampleOut=sampleIn;
 
     if ~isfield(sampleOut,'nN')%if not previously defined,
         sampleOut.nN=1;%define as 1
-    
+        
+        val=sampleOut.nN;        
+
+        depthArray=[depthmin:spacing:depthmax]';
+        nNarray=val*ones(length(depthArray),1);
+
+        sampleOut.nN=[depthArray nNarray];
+        
+        sampleOut.size='cobble';      
     elseif length(sampleOut.nN) > 1%or, if sample is already a cobble, do nothing
         disp('Sample is already a cobble. Doing nothing.')
     
