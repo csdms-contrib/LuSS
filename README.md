@@ -70,18 +70,19 @@ All other functions included in the repository are dependencies that should be k
 Recktenwald, G., 2006. [Transient, one-dimensional heat conduction in a convectively cooled sphere](http://www.webcitation.org/60nDyv3Yy), Portland State University, Dept. of MME.
 
 # *LuSS* GUI <a name="LuSS-GUI"></a>
+NOTE: If any previous version of *LuSS* is installed in your system, it is recommended to remove that installation before installating the newest version. To do so for the MATLAB toolbox installation, go to 'Home > Add-Ons > Manage Add-Ons' and remove the prior version. For the stand-alone, simply delete the *.exe file.
 
 ## Installing *LuSS* GUI as MATLAB toolbox <a name="install-toolbox"></a>
 *Preferred option, but requires existing MATLAB license and installation*
 
-There are two options for installing this app. If the user has an existing MATLAB license, the app can simply be installed as an app within the MATLAB toolbox environment by downloading and opening the file titled LuSS_GUI_v1_4.mltbx. This is the recommended method, but it requires a MATLAB license, which may be cost-prohibitive for some.
+There are two options for installing this app. If the user has an existing MATLAB license, the app can simply be installed as an app within the MATLAB toolbox environment by downloading and opening the file titled LuSS_GUI_v1_5.mltbx. This is the recommended method, but it requires a MATLAB license, which may be cost-prohibitive for some.
 
 ## Installing *LuSS* GUI as standalone application <a name="install-standalone"></a>
 *For those without MATLAB license, but requires MATLAB Runtime installation (free)*
 
 Alternately, the user can install a standalone instance of the GUI. For this option, MATLAB Runtime must be installed first. This is a rather large download which can be found on [the MathWorks website](https://www.mathworks.com/products/compiler/mcr/index.html). For more information about the MATLAB Runtime and the MATLAB Runtime installer, see "Distribute Applications" in the MATLAB Compiler documentation in the MathWorks Documentation Center.
 
-Once MATLAB Runtime is installed, the user can download and open the file titled LuSS_GUI_standalone_v1_4.exe to run the standalone GUI.
+Once MATLAB Runtime is installed, the user can download and open the file titled LuSS_GUI_standalone_v1_5.exe to run the standalone GUI.
 
 ## GUI description <a name="GUI-description"></a>
 For a detailed description of the *LuSS* GUI, including basic app functionality, a typical workflow, and three example applications, please see [Brown, 2025](#B2025).
