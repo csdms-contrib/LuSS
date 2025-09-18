@@ -5,6 +5,8 @@ A set of MATLAB functions to model how luminescence evolves in different geomorp
 ## GUI described in [Brown, (2025)](#B2025)
 A graphical user interface (GUI) that incorporates some of the functions in [Brown, (2020)](#B2020), as well as some additional features, such as simulating the history of multiple grains. For a full description of this GUI, or to cite your usage, please use [Brown, (2025)](#B2025).
 
+Check out a simple video tutorial [here](https://www.youtube.com/watch?v=nQCLNdgDChI).
+
 # Table of Contents
 1. [MATLAB functions](#MATLAB-fxns)
 	1. [Three worked examples](#three-examples)
